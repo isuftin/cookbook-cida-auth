@@ -50,7 +50,7 @@ node.default["wsi_tomcat"]["instances"]["default"]["context"]["resources"] = [{
         "remove_abandoned" => "true",
         "remove_abandoned_timeout" => "60",
         "log_abandoned" => "true",
-        "validation_query" => "select version()",
+        "validation_query" => "select * from dual",
         "encrypted_attributes" => {
         	"data_bag_name" => node["cida_auth"]["credentials_data_bag_name"],
         	"key_location" => node["cida_auth"]["data_bag_encryption_key"],
@@ -60,9 +60,6 @@ node.default["wsi_tomcat"]["instances"]["default"]["context"]["resources"] = [{
         	}
         }
 }]
-
-
-Chef::Log.info node["wsi_tomcat"]["instances"]["default"]["context"]["resources"]
 
 #all app components
 node.default["wsi_tomcat"]["instances"]["default"]["application"]["core"] = {
@@ -101,9 +98,22 @@ node.default["wsi_tomcat"]["lib_sources"] = [{
 }]
 
 include_recipe "wsi_tomcat::default"
-include_recipe "wsi_tomcat::deploy_application"
+
+#if we are using the oracle driver, we have to bring in the oracle jar
+jdbc_driver_class = node["cida_auth"]["jdbc_driver_class"]
+if jdbc_driver_class == "oracle.jdbc.OracleDriver"
+	# Bring in the needed ojdbc jar
+	tomcat_home_dir = node["wsi_tomcat"]["user"]["home_dir"]
+	tomcat_lib_dir = File.expand_path("lib", tomcat_home_dir)
+	ojdbc_jar = "ojdbc6.jar"
+	cookbook_file File.expand_path(ojdbc_jar, tomcat_lib_dir) do
+	  source ojdbc_jar
+	end
+end
+
 include_recipe "wsi_tomcat::download_libs"
 include_recipe "wsi_tomcat::update_context"
+include_recipe "wsi_tomcat::deploy_application"
 
 include_recipe "iptables::default"
 
