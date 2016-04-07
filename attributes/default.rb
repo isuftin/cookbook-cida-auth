@@ -1,47 +1,42 @@
-default["cida-auth"] = {
-	"cida_auth_version" => "1.1.3",
-	"schema_name" => "cida_auth",
-	"jdbc_driver_class" => "oracle.jdbc.OracleDriver", #oracle driver overrides the download properties below
-	"jdbc_driver_source" => "https://jdbc.postgresql.org/download/postgresql-9.4-1205.jdbc41.jar",
-	"jdbc_driver_filename" => "postgresql-9.4-1205.jdbc41.jar",
-	"jdbc_maven_group_id" => "org.postgresql",
-	"jdbc_maven_artifact_id" => "postgresql",
-	"jdbc_maven_version" => "9.4-1205-jdbc41",
-	"db_connection" => "jdbc:oracle:thin:@HOST:1521:cidaauth",
-	"credentials_data_bag_name" => "credentials-data-bag",
-	"credentials_data_bag_item" => "credentials",
-	"data_bag_encryption_key" => "/etc/chef/data-bag-encryption-key",
-	"data_bag_username_field" => "database.username",
-	"data_bag_password_field" => "database.password",
-	"tomcat" => {
-		"manager.core.source.war" => "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-core/1.0.3/auth-manager-core-1.0.3.war",
-		"manager.core.final.name" => "auth-manager-core",
-		"manager.source.war"=> "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-console/1.0.3/auth-manager-console-1.0.3.war",
-		"manager.final.name" => "auth-manager-console",
-		"cida.auth.source.war" => "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-webservice/1.1.3/auth-webservice-1.1.3.war",
-		"cida.auth.final.name" => "auth-webservice",
-		"development" => "true",
-		"auth.ldap.url" => "ldaps://host:3269",
-		"auth.ldap.domain" => "DC=gs,DC=doi,dc=net",
-		"auth.ldap.bind.user.prefix" => "",
-		"auth.ldap.bind.user.suffix" => "@gs.doi.net",
-		"auth.manager.password.algorithm" => "SHA1",
-		"auth.manager.core.rest.url" => "https://localhost=>8443/auth-manager-core/rest/",
-		"auth.manager.core.host" => "localhost",
-		"auth.manager.core.port" => "8443",
-		"auth.manager.core.scheme" => "https",
-		"auth.oauth.required.domain" => "usgs.gov",
-		"auth.oauth.endpoint" => "https://accounts.google.com/o/oauth2/v2/auth",
-		"encrypted_environments_data_bag" => {
-			"data_bag_name" => "credentials-data-bag",
-			"data_bag_item" => "credentials",
-			"key_location" => "/etc/chef/data-bag-encryption-key",
-			"extract_fields" => ["auth.manager.username", "auth.manager.password", "auth.oauth.client.id", "auth.oath.client.secret"]
-		},
-		"wsi_tomcat_keys_config" => {
-			"data_bag_name" => "keystore-data-bag",
-			"data_bag_item" => "keystore-config",
-			"key_location" => "/etc/chef/data-bag-encryption-key"
-		}
-	}
-}
+default["cida-auth"]["cida_auth_version"] = "1.1.3"
+default["cida-auth"]["schema_name"] = "cida_auth"
+
+default["cida-auth"]["jdbc_driver_class"] = "oracle.jdbc.OracleDriver"
+default["cida-auth"]["jdbc_driver_name"] = "ojdbc6"
+default["cida-auth"]["jdbc_driver_source"] = "https://jdbc.postgresql.org/download/postgresql-9.4-1205.jdbc41.jar"
+default["cida-auth"]["jdbc_driver_filename"] = "postgresql-9.4-1205.jdbc41.jar"
+default["cida-auth"]["jdbc_maven_group_id"] = "org.postgresql"
+default["cida-auth"]["jdbc_maven_artifact_id"] = "postgresql"
+default["cida-auth"]["jdbc_maven_version"] = "9.4-1205-jdbc41"
+default["cida-auth"]["db_connection"] = "jdbc:oracle:thin:@127.0.1:1521:cidaauth"
+
+default["cida-auth"]["credentials_data_bag_name"] = "cida-auth-credentias-_default"
+default["cida-auth"]["credentials_data_bag_item"] = "credentials"
+default["cida-auth"]["data_bag_username_field"] = "database.username"
+default["cida-auth"]["data_bag_password_field"] = "database.password"
+
+default["cida-auth"]["tomcat"]["manager.core.source.war"] = "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-core/1.0.3/auth-manager-core-1.0.3.war"
+default["cida-auth"]["tomcat"]["manager.core.final.name"] = "auth-manager-core"
+default["cida-auth"]["tomcat"]["manager.source.war"] = "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-console/1.0.3/auth-manager-console-1.0.3.war"
+default["cida-auth"]["tomcat"]["manager.final.name"] = "auth-manager-console"
+default["cida-auth"]["tomcat"]["cida.auth.source.war"] = "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-webservice/1.1.3/auth-webservice-1.1.3.war"
+default["cida-auth"]["tomcat"]["cida.auth.final.name"] = "auth-webservice"
+default["cida-auth"]["tomcat"]["development"] = "true"
+default["cida-auth"]["tomcat"]["auth.ldap.url"] = "ldaps://host:3269"
+default["cida-auth"]["tomcat"]["auth.ldap.domain"] = "DC=gs,DC=doi,dc=net"
+default["cida-auth"]["tomcat"]["auth.ldap.bind.user.prefix"] = ""
+default["cida-auth"]["tomcat"]["auth.ldap.bind.user.suffix"] = "@gs.doi.net"
+default["cida-auth"]["tomcat"]["auth.manager.password.algorithm"] = "SHA1"
+default["cida-auth"]["tomcat"]["auth.manager.core.rest.url"] = "https://localhost=>8443/auth-manager-core/rest/"
+default["cida-auth"]["tomcat"]["auth.manager.core.host"] = "localhost"
+default["cida-auth"]["tomcat"]["auth.manager.core.port"] = "8443"
+default["cida-auth"]["tomcat"]["auth.manager.core.scheme"] = "https"
+default["cida-auth"]["tomcat"]["auth.oauth.required.domain"] = "usgs.gov"
+default["cida-auth"]["tomcat"]["auth.oauth.endpoint"] = "https://accounts.google.com/o/oauth2/v2/auth"
+default["cida-auth"]["tomcat"]["encrypted_environments_data_bag"]["data_bag_name"] = "credentials-data-bag"
+default["cida-auth"]["tomcat"]["encrypted_environments_data_bag"]["data_bag_item"] = "credentials"
+default["cida-auth"]["tomcat"]["encrypted_environments_data_bag"]["key_location"] = "/etc/chef/data-bag-encryption-key"
+default["cida-auth"]["tomcat"]["encrypted_environments_data_bag"]["extract_fields"] = ["auth.manager.username", "auth.manager.password", "auth.oauth.client.id", "auth.oath.client.secret"]
+default["cida-auth"]["tomcat"]["wsi_tomcat_keys_config"]["data_bag_name"] = "keystore-data-bag"
+default["cida-auth"]["tomcat"]["wsi_tomcat_keys_config"]["data_bag_item"] = "keystore-config"
+default["cida-auth"]["tomcat"]["wsi_tomcat_keys_config"]["key_location"] = "/etc/chef/data-bag-encryption-key"
