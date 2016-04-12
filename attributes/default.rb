@@ -1,19 +1,22 @@
-default["cida-auth"]["cida_auth_version"] = "1.1.3"
-default["cida-auth"]["schema_name"] = "cida_auth"
+default["cida-auth"]["cida_auth_version"] = "1.1.8"
 
-default["cida-auth"]["jdbc_driver_class"] = "oracle.jdbc.OracleDriver"
-default["cida-auth"]["jdbc_driver_name"] = "ojdbc6"
-default["cida-auth"]["jdbc_driver_source"] = "https://jdbc.postgresql.org/download/postgresql-9.4-1205.jdbc41.jar"
-default["cida-auth"]["jdbc_driver_filename"] = "postgresql-9.4-1205.jdbc41.jar"
-default["cida-auth"]["jdbc_maven_group_id"] = "org.postgresql"
-default["cida-auth"]["jdbc_maven_artifact_id"] = "postgresql"
-default["cida-auth"]["jdbc_maven_version"] = "9.4-1205-jdbc41"
-default["cida-auth"]["db_connection"] = "jdbc:oracle:thin:@127.0.1:1521:cidaauth"
-
-default["cida-auth"]["credentials_data_bag_name"] = "cida-auth-credentias-_default"
+default["cida-auth"]["credentials_data_bag_name"] = "cida-auth-credentials-_default"
 default["cida-auth"]["credentials_data_bag_item"] = "credentials"
 default["cida-auth"]["data_bag_username_field"] = "database.username"
 default["cida-auth"]["data_bag_password_field"] = "database.password"
+
+# Set for the type of database that CIDA Auth will interface with
+default["cida-auth"]["database"]["type"] = "oracle"
+default["cida-auth"]["database"]["schema_name"] = "cida_auth"
+default["cida-auth"]["database"]["name"] = "oracle"
+default["cida-auth"]["database"]["host"] = "127.0.0.1"
+default["cida-auth"]["database"]["port"] = "1521"
+default["cida-auth"]["database"]["liquibase"]["runas"] = "oracle"
+default["cida-auth"]["database"]["jdbc_maven_artifact_id"] = "ojdbc6" # Oracle Only
+default["cida-auth"]["database"]["jdbc_driver_location"] = "/root/ojdbc6.jar" # Oracle Only
+default["cida-auth"]["database"]["jdbc_driver_version"] = "11.2.0.3-1" # Oracle Only
+
+default["cida-auth"]["database"]["db_connection"] = "jdbc:oracle:thin:@127.0.1:1521:cidaauth"
 
 default["cida-auth"]["tomcat"]["manager.core.source.war"] = "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-core/1.0.3/auth-manager-core-1.0.3.war"
 default["cida-auth"]["tomcat"]["manager.core.final.name"] = "auth-manager-core"

@@ -5,11 +5,19 @@
 #
 # Description: Creates the liquibase user, optionally installs the Oracle OJDBC jar
 
-jdbc_driver_class = node["cida-auth"]["jdbc_driver_class"]
-jdbc_maven_group_id = node["cida-auth"]["jdbc_maven_group_id"]
-jdbc_maven_artifact_id = node["cida-auth"]["jdbc_maven_artifact_id"]
-jdbc_maven_version = node["cida-auth"]["jdbc_maven_version"]
-schema_name = node['cida-auth']['schema_name']
+cida_auth_version = node['cida-auth']['cida_auth_version']
+database_config = node["cida-auth"]["database"]
+database_type = database_config["type"]
+schema_name = database_config["schema_name"]
+db_name = database_config["name"]
+db_host = database_config["host"]
+db_port = database_config["port"]
+runas_user = database_config["liquibase"]["runas"]
+jdbc_maven_group_id = database_config["jdbc_maven_group_id"]
+jdbc_maven_artifact_id = database_config["jdbc_maven_artifact_id"]
+jdbc_maven_version = database_config["jdbc_driver_version"]
+jdbc_driver_location = database_config["jdbc_driver_location"]
+
 data_bag_name = node['cida-auth']['credentials_data_bag_name']
 data_bag_item = node['cida-auth']['credentials_data_bag_item']
 data_bag_username_field = node['cida-auth']['data_bag_username_field']
@@ -17,12 +25,10 @@ data_bag_password_field = node['cida-auth']['data_bag_password_field']
 credential_data_bag = data_bag_item(data_bag_name, data_bag_item)
 username = credential_data_bag[data_bag_username_field]
 pass = credential_data_bag[data_bag_password_field]
-cida_auth_version = node['cida-auth']['cida_auth_version']
-db_connection = node['cida-auth']['db_connection']
-
 os_user_name = "liquibase"
 group_name = os_user_name
-
+home = "/home/#{os_user_name}"
+repo_location = "#{home}/.m2/repository"
 
 # create liquibase group
 group group_name
@@ -33,54 +39,81 @@ user os_user_name do
   system true
   gid group_name
   manage_home true
-  home "/home/#{os_user_name}"
+  home home
 end
 
-
 #if we are using the oracle driver, we have to install the jar in the local mvn repo so the liquibase plugin can use it
-if jdbc_driver_class == "oracle.jdbc.OracleDriver"
+if database_type == "oracle"
+  driver_group_name="com.oracle"
+  profile="cida-auth-liquibase-oracle"
+
   # Bring in the needed ojdbc jar
-  ojdbc_name = node["cida-auth"]["jdbc_driver_name"]
-  ojdbc_jar = "#{ojdbc_name}.jar"
-  cookbook_file File.expand_path(ojdbc_jar, "/home/liquibase") do
+  ojdbc_jar = "#{jdbc_maven_artifact_id}.jar"
+  ojdbc_jar_location = "#{home}/#{ojdbc_jar}"
+  remote_file ojdbc_jar_location do
     owner os_user_name
     group group_name
-    source ojdbc_jar
+    source jdbc_driver_location
   end
-
-  repo_location = "/home/#{os_user_name}/.m2/repository"
-  lib_group_name = "localDependency"
 
   # Test whether or not this jar already exists. If so, do not re-run
   execute "install_mvn_ojdbc" do
     user os_user_name
     group group_name
-    cwd "/home/#{os_user_name}"
-    command "mvn install:install-file -Dmaven.repo.local=#{repo_location} -Dfile=#{ojdbc_jar} -DgroupId=#{lib_group_name} -DartifactId=#{ojdbc_name} -Dversion=#{ojdbc_name} -Dpackaging=jar"
-    not_if do ::File.exists?("#{repo_location}/#{lib_group_name}/#{ojdbc_name}/#{ojdbc_name}/#{ojdbc_name}-#{ojdbc_jar}") end
+    cwd home
+    command "mvn install:install-file -Dmaven.repo.local=#{repo_location} -Dfile=#{ojdbc_jar_location} -DgroupId=#{driver_group_name} -DartifactId=#{jdbc_maven_artifact_id} -Dversion=#{jdbc_maven_version} -Dpackaging=jar"
+    not_if do ::File.exists?("#{repo_location}/com/oracle/#{jdbc_maven_artifact_id}/#{jdbc_maven_version}/#{jdbc_maven_artifact_id}-#{jdbc_maven_version}.jar") end
   end
+else
+  profile="cida-auth-liquibase-postgres"
 end
 
-template '/home/liquibase/pom.xml' do
-  owner os_user_name
-  group group_name
-  source "pom.xml.erb"
+# Pull down cida-auth - if new version, create template, unpackage repo and run maven against database
+github_url="https://codeload.github.com/USGS-CIDA/cida-auth/tar.gz/auth-parent-#{cida_auth_version}"
+archive="#{home}/auth-parent.tar.gz"
+expanded_location="#{home}/cida-auth-auth-parent-#{cida_auth_version}"
+liquibase_location="#{expanded_location}/auth-database"
+settings_file="#{Chef::Config[:file_cache_path]}/mvn_settings.xml"
+remote_file archive do
+  user os_user_name
+  source github_url
+  notifies :run, "execute[unpackage_archive]", :immediately
+  notifies :run, "execute[run_liquibase]", :delayed
+end
+
+# Create a Maven settings file to put properties into.
+# If properties changed, run liquibase again
+template settings_file do
+  source "maven_liquibase_settings.xml.erb"
+  variables({
+              :profile_id => profile,
+              :schema_name => schema_name,
+              :db_name => db_name,
+              :username => username,
+              :pass => pass,
+              :runas_user => runas_user,
+              :db_host => db_host,
+              :db_port => db_port
+  })
   sensitive true
-  variables(
-    :cida_auth_version => cida_auth_version,
-    :schema_name => schema_name,
-    :jdbc_maven_group_id => jdbc_maven_group_id,
-    :jdbc_maven_artifact_id => jdbc_maven_artifact_id,
-    :jdbc_maven_version => jdbc_maven_version,
-    :db_driver => jdbc_driver_class,
-    :db_connection => db_connection,
-    :db_username	=> username,
-    :db_password => pass
-  )
+  notifies :run, "execute[run_liquibase]", :delayed
 end
 
-# bash "run_maven_liquibase" do
-#   cwd "/home/liquibase"
-#   code "mvn dependency:unpack liquibase:update"
-#   action :run
-# end
+# Unpackage cida-auth liquibase
+execute "unpackage_archive" do
+  user os_user_name
+  group group_name
+  command "/bin/tar xzfv #{archive}"
+  cwd home
+  action :nothing
+end
+
+# Only perform liquibase run when a new version of the cida-auth liquibase jar has been downloaded
+execute "run_liquibase" do
+  user os_user_name
+  group group_name
+  command "mvn -X -s #{settings_file} -Dmaven.repo.local=#{repo_location} install -P #{profile}"
+  user os_user_name
+  cwd liquibase_location
+  action :nothing
+end

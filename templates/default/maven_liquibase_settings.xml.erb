@@ -1,0 +1,19 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <profiles>
+    <profile>
+      <id><%= @profile_id %></id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <db.auth.schemaname><%= @schema_name %></db.auth.schemaname>
+        <db.auth.dbname><%= @db_name %></db.auth.dbname>
+        <db.auth.user><%= @username %></db.auth.user>
+        <db.auth.pass><%= @pass %></db.auth.pass>
+        <db.auth.runasusername><%= @runas_user %></db.auth.runasusername>
+        <db.auth.host><%= @db_host %></db.auth.host>
+        <db.auth.port><%= @db_port %></db.auth.port>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
