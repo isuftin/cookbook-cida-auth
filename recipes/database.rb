@@ -5,7 +5,7 @@
 #
 # Description: Creates the liquibase user, optionally installs the Oracle OJDBC jar
 
-cida_auth_version = node['cida-auth']['cida_auth_version']
+cida_auth_version = node["cida-auth"]["version"]["cida_auth"]
 database_config = node["cida-auth"]["database"]
 database_type = database_config["type"]
 schema_name = database_config["schema_name"]
@@ -20,8 +20,8 @@ jdbc_driver_location = database_config["jdbc_driver_location"]
 
 data_bag_name = node['cida-auth']['credentials_data_bag_name']
 data_bag_item = node['cida-auth']['credentials_data_bag_item']
-data_bag_username_field = node['cida-auth']['data_bag_username_field']
-data_bag_password_field = node['cida-auth']['data_bag_password_field']
+data_bag_username_field = database_config['data_bag_username_field']
+data_bag_password_field = database_config['data_bag_password_field']
 credential_data_bag = data_bag_item(data_bag_name, data_bag_item)
 username = credential_data_bag[data_bag_username_field]
 pass = credential_data_bag[data_bag_password_field]
