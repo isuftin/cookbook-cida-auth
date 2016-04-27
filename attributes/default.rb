@@ -1,6 +1,6 @@
-default["cida-auth"]["version"]["cida_auth"] = "1.1.9"
-default["cida-auth"]["version"]["manager_console"] = "1.1.9"
-default["cida-auth"]["version"]["manager_core"] = "1.1.9"
+default["cida-auth"]["version"]["cida_auth"] = "1.2.3"
+default["cida-auth"]["version"]["manager_console"] = "1.2.3"
+default["cida-auth"]["version"]["manager_core"] = "1.2.3"
 
 default["cida-auth"]["credentials_data_bag_name"] = "cida-auth-credentials-_default"
 default["cida-auth"]["credentials_data_bag_item"] = "credentials"

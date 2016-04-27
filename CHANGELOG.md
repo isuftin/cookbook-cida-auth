@@ -3,6 +3,7 @@
 
 - [isuftin@usgs.gov] - Tested as working with both Oracle and Postgres and the WSI Tomcat cookbook 
 - [isuftin@usgs.gov] - Added more testing. 
+- [isuftin@usgs.gov] - Updated to latest CIDA Auth version. 
 
 0.2.0
 -----
