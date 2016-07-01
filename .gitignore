@@ -1,8 +1,9 @@
 .kitchen/
 .kitchen.local.yml
-/.kitchen.yml
 /.project
 /Berksfile.lock
 /Gemfile
 /Thorfile
 test/files/ojdbc6.jar
+nodes/*
+.vagrant/*
