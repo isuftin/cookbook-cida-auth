@@ -13,6 +13,11 @@
             }
         },
         "cida-auth": {
+            "version": {
+                "cida_auth": "1.2.5",
+                "manager_console": "1.2.5",
+                "manager_core": "1.2.5"
+            },
             "database": {
                 "type": "postgres",
                 "schema_name": "public",

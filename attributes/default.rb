@@ -1,6 +1,6 @@
-default["cida-auth"]["version"]["cida_auth"] = "1.2.3"
-default["cida-auth"]["version"]["manager_console"] = "1.2.3"
-default["cida-auth"]["version"]["manager_core"] = "1.2.3"
+default["cida-auth"]["version"]["cida_auth"] = "1.2.5"
+default["cida-auth"]["version"]["manager_console"] = "1.2.5"
+default["cida-auth"]["version"]["manager_core"] = "1.2.5"
 
 default["cida-auth"]["credentials_data_bag_name"] = "cida-auth-credentials-_default"
 default["cida-auth"]["credentials_data_bag_item"] = "credentials"
@@ -20,4 +20,3 @@ default["cida-auth"]["database"]["jdbc_driver_version"] = "11.2.0.3-1" # Oracle 
 
 default["cida-auth"]["tomcat"]["auth.oauth.required.domain"] = "usgs.gov"
 default["cida-auth"]["tomcat"]["auth.oauth.endpoint"] = "https://accounts.google.com/o/oauth2/v2/auth"
-
