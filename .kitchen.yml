@@ -48,7 +48,12 @@ suites:
           }
       },
       "wsi_tomcat" : {
-        "version" : "8.0.33",
+        "version" : "8.0.36",
+        "file" : {
+          "archive" : {
+            "checksum" : "7963464d86faf8416b92fb2b04c70da9759c7c332e1700c1e9f581883b4db664"
+          }
+        },
         "disable_manager" : false,
         "data_bag_config" : {
           "bag_name" : "cida-auth-credentials-_default",
