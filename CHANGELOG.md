@@ -1,3 +1,14 @@
+CIDA Auth Chef Cookbook Changelog
+=================================
+
+0.2.4
+-----
+
+- [isuftin@usgs.gov] - Took out recipe which directly calls on the wsi_tomcat cookbook and instead
+	moved that into Kitchen configuration
+- [isuftin@usgs.gov] - Split out iptables configuration into own recipe
+- [isuftin@usgs.gov] - Updated release version for the CIDA Auth app in attributes 
+
 0.2.3
 -----
 

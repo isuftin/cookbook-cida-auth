@@ -28,10 +28,16 @@ platforms:
 suites:
   - name: default
     run_list:
+      - recipe[doi_ssl_filtering]
       - recipe[java]
       - recipe[maven]
+      - recipe[iptables::default]
       - recipe[cida-auth::database]
-      - recipe[cida-auth::appstack]
+      - recipe[cida-auth::iptables]
+      - recipe[wsi_tomcat::default]
+      - recipe[wsi_tomcat::download_libs]
+      - recipe[wsi_tomcat::update_context]
+      - recipe[wsi_tomcat::deploy_application]
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'
     encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
@@ -83,9 +89,22 @@ suites:
               "XX:+CMSIncrementalMode"
             ],
             "application" : {
-              "core" : { "final_name" : "auth-manager-core" },
-              "manager" : { "final_name" : "auth-manager-console" },
-              "cida_auth" : { "final_name" : "auth-webservice" }
+              "probe": {
+                  "url": "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
+                  "final_name": "probe"
+              },
+              "auth-manager-core": {
+                  "url": "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-core/1.2.6/auth-manager-core-1.2.6.war",
+                  "final_name": "auth-manager-core"
+              },
+              "auth-manager-console": {
+                  "url": "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-manager-console/1.2.6/auth-manager-console-1.2.6.war",
+                  "final_name": "auth-manager-console"
+              },
+              "auth-webservice": {
+                  "url": "http://cida.usgs.gov/maven/cida-public-releases/gov/usgs/cida/auth/auth-webservice/1.2.6/auth-webservice-1.2.6.war",
+                  "final_name": "auth-webservice"
+              }
             },
 
             "context" : {
