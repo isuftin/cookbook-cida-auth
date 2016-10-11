@@ -1,6 +1,11 @@
 CIDA Auth Chef Cookbook Changelog
 =================================
 
+0.2.4
+-----
+
+- [isuftin@usgs.gov] - Updated to using new Tomcat cookbook version
+
 0.2.3
 -----
 
