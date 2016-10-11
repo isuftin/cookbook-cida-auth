@@ -2,9 +2,9 @@ source "https://supermarket.getchef.com"
 
 metadata
 
-cookbook 'wsi_tomcat', github: "USGS-CIDA/cookbook-tomcat", tag: "v0.1.13"
+cookbook 'wsi_tomcat', github: "USGS-CIDA/cookbook-tomcat", tag: "v0.2.0"
 cookbook 'maven'
-cookbook 'iptables', '~> 2.2.0'
+cookbook 'iptables', '~> 3.0.0'
 cookbook 'cloudwatch-logs', '~> 0.0.6'
 
 # The following is optional and only used if testing on the DOI network

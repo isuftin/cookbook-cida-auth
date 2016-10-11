@@ -30,6 +30,7 @@ suites:
     run_list:
       - recipe[doi_ssl_filtering]
       - recipe[java]
+      - recipe[doi_ssl_filtering::java]
       - recipe[maven]
       - recipe[iptables::default]
       - recipe[cida-auth::database]
@@ -54,10 +55,16 @@ suites:
           }
       },
       "wsi_tomcat" : {
-        "version" : "8.0.36",
+        "version" : "8.0.37",
         "file" : {
           "archive" : {
-            "checksum" : "7963464d86faf8416b92fb2b04c70da9759c7c332e1700c1e9f581883b4db664"
+            "mirrors" : [
+              "ftp://apache.mirrors.tds.net/pub/apache.org/",
+              "ftp://apache.cs.utah.edu/apache.org/",
+              "ftp://ftp.osuosl.org/pub/apache/",
+              "ftp://mirror.reverse.net/pub/apache/"
+            ],
+            "checksum" : "2616c94e7da31a773129d7eaba9da365dd6a298b5e0e5aa457b9f12fbb272d39"
           }
         },
         "disable_manager" : false,
@@ -66,11 +73,11 @@ suites:
           "credentials_attribute" : "credentials"
         },
         "lib_sources" : [
-          {
-            "name" : "ojdbc6.jar",
-            "url" : "file:///tmp/kitchen/data/ojdbc6.jar"
-          }
-        ],
+            {
+              "name" : "postgres-jdbc.jar",
+              "url" : "https://jdbc.postgresql.org/download/postgresql-9.4-1202.jdbc41.jar"
+            }
+          ],
         "instances" : {
           "default" : {
             "server_opts" : [
@@ -135,18 +142,18 @@ suites:
               "resources" : [{
                 "description" : "token storage database",
                 "name" : "jdbc/cidaAuthDS",
-                "max_active" : "50",
                 "remove_abandoned_timeout" : "60",
-                
+                "auth" : "container",
+                "type" : "javax.sql.DataSource",
                 # Oracle
                 # "url" : "jdbc:oracle:thin:@192.168.99.100:1521:xe",
 
                 # Postgres
                 "url" : "jdbc:postgresql://192.168.99.100:5432/postgres",
-                "driver_class" : "org.postgresql.Driver",
-                "validation_query" : "select 1",
-                "jdbc_interceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
-                "default_auto_commit" : "true",
+                "factory" : "org.apache.tomcat.jdbc.pool.DataSourceFactory",
+                "driverClassName" : "org.postgresql.Driver",
+                "validationQuery" : "select 1",
+                "jdbcInterceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
                 "encrypted_attributes" : {
                   "data_bag_name" : "cida-auth-credentials-_default",
                   "data_bag_item" : "credentials",
@@ -234,194 +241,6 @@ suites:
         }
       }
     }
-
-  - name: oracle
-    run_list:
-      - recipe[java]
-      - recipe[maven]
-      - recipe[cida-auth::database]
-      - recipe[cida-auth::appstack]
-    data_path: test/files
-    data_bags_path: './test/integration/default/data_bags/'
-    encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
-    attributes: {
-      "maven" : {
-        "version" : "3.3.9",
-        "setup_bin" : true
-      },
-      "java" : {
-          "install_flavor" : "oracle",
-          "jdk_version" : "8",
-          "oracle" : {
-               "accept_oracle_download_terms" : true
-          }
-      },
-      "wsi_tomcat" : {
-        "version" : "8.0.33",
-        "disable_manager" : false,
-        "data_bag_config" : {
-          "bag_name" : "cida-auth-credentials-_default",
-          "credentials_attribute" : "credentials"
-        },
-        "lib_sources" : [
-          {
-            "name" : "ojdbc6.jar",
-            "url" : "file:///tmp/kitchen/data/ojdbc6.jar"
-          }
-        ],
-        "instances" : {
-          "default" : {
-            "server_opts" : [
-              "server",
-              "Djava.awt.headless=true",
-              "Dfile.encoding=UTF-8",
-              "Xms1536m",
-              "Xmx1536m",
-              "XX:NewSize=256m",
-              "XX:MaxNewSize=256m",
-              "XX:PermSize=512",
-              "XX:MaxPermSize=512m",
-              "XX:+DisableExplicitGC",
-              "XX:+UseConcMarkSweepGC",
-              "XX:+CMSClassUnloadingEnabled",
-              "XX:+CMSIncrementalMode"
-            ],
-            "application" : {
-              "core" : { "final_name" : "auth-manager-core" },
-              "manager" : { "final_name" : "auth-manager-console" },
-              "cida_auth" : { "final_name" : "auth-webservice" }
-            },
-
-            "context" : {
-              "encrypted_environments_data_bag" : {
-                "data_bag_name" : "cida-auth-environment-_default",
-                "data_bag_item" : "context",
-                "extract_fields" : ["auth.manager.password", "auth.http.basic"]
-              },
-              "environments" : [
-                  { "name" : "development", "type" : "java.lang.String", "override" : true, "value" : "true"},
-
-                  { "name" : "auth.ldap.url", "type" : "java.lang.String", "override" : true, "value" : "ldaps://IGSKMNCIDC01.gs.doi.net:3269"},
-                  { "name" : "auth.ldap.domain", "type" : "java.lang.String", "override" : true, "value" : "DC=gs,DC=doi,dc=net"},
-                  { "name" : "auth.ldap.bind.user.prefix", "type" : "java.lang.String", "override" : true, "value" : ""},
-                  { "name" : "auth.ldap.bind.user.suffix", "type" : "java.lang.String", "override" : true, "value" : "@gs.doi.net"},
-
-                  { "name" : "auth.manager.password.algorithm", "type" : "java.lang.String", "override" : true, "value" : "SHA1"},
-                  { "name" : "auth.manager.username", "type" : "java.lang.String", "override" : true, "value" : "cida-admin"},
-                  # { "name" : "auth.manager.password", "type" : "java.lang.String", "override" : true, "value" : "This comes from the cida-auth-environment databag"},
-                  { "name" : "auth.manager.core.rest.url", "type" : "java.lang.String", "override" : true, "value" : "http://localhost:8080/auth-manager-core/rest/"},
-                  { "name" : "auth.manager.core.host", "type" : "java.lang.String", "override" : true, "value" : "localhost"},
-                  { "name" : "auth.manager.core.port", "type" : "java.lang.String", "override" : true, "value" : "8080"},
-                  { "name" : "auth.manager.core.scheme", "type" : "java.lang.String", "override" : true, "value" : "http"},
-                  
-                  # { "name" : "auth.http.basic", "type" : "java.lang.String", "override" : true, "value" : "This comes from the cida-auth-environment databag"},
-                  { "name" : "auth.crowd.url", "type" : "java.lang.String", "override" : true, "value" : "https://my.usgs.gov/crowd/rest/usermanagement/latest"}
-              ],
-              "resources" : [{
-                "description" : "token storage database",
-                "name" : "jdbc/cidaAuthDS",
-                "max_active" : "50",
-                "remove_abandoned_timeout" : "60",
-                
-                # Oracle
-                # "url" : "jdbc:oracle:thin:@192.168.99.100:1521:xe",
-
-                # Postgres
-                "url" : "jdbc:postgresql://192.168.99.100:5432/postgres",
-                "driver_class" : "org.postgresql.Driver",
-                "validation_query" : "select 1",
-                "jdbc_interceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
-                "default_auto_commit" : "true",
-                "encrypted_attributes" : {
-                  "data_bag_name" : "cida-auth-credentials-_default",
-                  "data_bag_item" : "credentials",
-                  "field_map" : {
-                    "database.username" : "username",
-                    "database.password" : "password"
-                  }
-                }
-              }]
-            },
-            "service_definitions" : [
-            {
-              "name" : "Catalina",
-              "thread_pool" : {
-                "max_threads" : 200,
-                "daemon" : "true",
-                "min_spare_threads" : 25,
-                "max_idle_time" : 60000
-              },
-              "connector" : {
-                "port" : 8080
-              },
-              "ssl_connector" : {
-                "enabled" : true,
-                "wsi_tomcat_keys_data_bag" : "cida-auth-credentials-_default",
-                "wsi_tomcat_keys_data_item" : "credentials",
-                
-                # Provided Certs
-
-                "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
-                "ssl_key_file" : "file:///tmp/kitchen/data/certs/client.key",
-                "trust_certs" : [
-                  {"name" : "www.host1.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"},
-                  {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
-                ]
-
-                # Create Certs
-                # "directory_info" : {
-                #   "name" : "gov.usgs.cida",
-                #   "org_unit" : "DevOps",
-                #   "org" : "CIDA",
-                #   "locality" : "Middleton",
-                #   "state" : "WI",
-                #   "country" : "US"
-                # },
-                # "trust_certs" : [
-                #   {"name" : "www.host1.com"},
-                #   {"name" : "www.host2.com"}
-                # ]
-
-              },
-              "engine" : { 
-                "host" : [
-                  { "name" : "localhost" } 
-                ] 
-              }
-            }
-            ]
-          }
-        }
-      },
-      "cida-auth" : {
-        
-        "database" : {
-          # Postgres - see README.md
-          "type" : "postgres",
-          "schema_name" : "public",
-          "name" : "postgres",
-          "host" : "192.168.99.100",
-          "port" : "5432",
-          "liquibase" : {
-            "runas" : "postgres"
-          }
-
-          # Oracle - see README.md
-          # "jdbc_driver_location" : "file:///tmp/kitchen/data/ojdbc6.jar",
-          # "type" : "oracle",
-          # "schema_name" : "system",
-          # "name" : "xe",
-          # "host" : "192.168.99.100",
-          # "port" : "1521",
-          # "liquibase" : {
-          #   "runas" : "oracle"
-          # }
-        }
-      }
-    }
-
-  
-
 
   - name: default-with-stig
     run_list:
@@ -509,18 +328,18 @@ suites:
               "resources" : [{
                 "description" : "token storage database",
                 "name" : "jdbc/cidaAuthDS",
-                "max_active" : "50",
                 "remove_abandoned_timeout" : "60",
-                
+                "auth" : "container",
+                "type" : "javax.sql.DataSource",
                 # Oracle
                 # "url" : "jdbc:oracle:thin:@192.168.99.100:1521:xe",
 
                 # Postgres
                 "url" : "jdbc:postgresql://192.168.99.100:5432/postgres",
-                "driver_class" : "org.postgresql.Driver",
-                "validation_query" : "select 1",
-                "jdbc_interceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
-                "default_auto_commit" : "true",
+                "factory" : "org.apache.tomcat.jdbc.pool.DataSourceFactory",
+                "driverClassName" : "org.postgresql.Driver",
+                "validationQuery" : "select 1",
+                "jdbcInterceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
                 "encrypted_attributes" : {
                   "data_bag_name" : "cida-auth-credentials-_default",
                   "data_bag_item" : "credentials",
