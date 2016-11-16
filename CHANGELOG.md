@@ -1,6 +1,11 @@
 CIDA Auth Chef Cookbook Changelog
 =================================
 
+0.2.5
+-----
+
+- [isuftin@usgs.gov] - Change when Liquibase runs take place
+
 0.2.4
 -----
 

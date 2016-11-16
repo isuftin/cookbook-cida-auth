@@ -74,12 +74,6 @@ archive="#{home}/auth-parent.tar.gz"
 expanded_location="#{home}/cida-auth-auth-parent-#{cida_auth_version}"
 liquibase_location="#{expanded_location}/auth-database"
 settings_file="#{Chef::Config[:file_cache_path]}/mvn_settings.xml"
-remote_file archive do
-  user os_user_name
-  source github_url
-  notifies :run, "execute[unpackage_archive]", :immediately
-  notifies :run, "execute[run_liquibase]", :delayed
-end
 
 # Create a Maven settings file to put properties into.
 # If properties changed, run liquibase again
@@ -97,6 +91,13 @@ template settings_file do
   })
   sensitive true
   notifies :run, "execute[run_liquibase]", :delayed
+end
+
+remote_file archive do
+  user os_user_name
+  source github_url
+  notifies :run, "execute[unpackage_archive]", :immediately
+  notifies :run, "execute[run_liquibase]", :immediately
 end
 
 # Unpackage cida-auth liquibase
